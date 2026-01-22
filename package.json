@@ -1,0 +1,17 @@
+{
+  "name": "static-quiz-app",
+  "version": "1.0.0",
+  "description": "TypeScript & Angular Quiz Application",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8080"
+  },
+  "keywords": [
+    "quiz",
+    "typescript",
+    "angular",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT"
+}
