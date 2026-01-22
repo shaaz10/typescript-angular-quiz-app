@@ -1,0 +1,30 @@
+{
+    "topScorers": [
+        {
+            "id": 1,
+            "name": "Demo User",
+            "score": 58,
+            "totalQuestions": 60,
+            "percentage": 97,
+            "date": "2026-01-22T10:00:00.000Z",
+            "timeTaken": "15:30",
+            "badge": "Master"
+        }
+    ],
+    "allScores": [
+        {
+            "id": 1,
+            "name": "Demo User",
+            "score": 58,
+            "totalQuestions": 60,
+            "percentage": 97,
+            "date": "2026-01-22T10:00:00.000Z"
+        }
+    ],
+    "stats": {
+        "totalAttempts": 1,
+        "averageScore": 58,
+        "highestScore": 58,
+        "lastUpdated": "2026-01-22T10:00:00.000Z"
+    }
+}

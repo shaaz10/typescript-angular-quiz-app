@@ -10,6 +10,7 @@ class QuizApp {
         this.initializeElements();
         this.attachEventListeners();
         this.loadLeaderboard();
+        this.loadTopScorer();
         this.displayTopScores();
     }
 
@@ -24,6 +25,13 @@ class QuizApp {
         this.playerNameInput = document.getElementById('playerName');
         this.startQuizBtn = document.getElementById('startQuizBtn');
         this.topScoresList = document.getElementById('topScoresList');
+
+        // Top scorer showcase elements
+        this.topScorerName = document.getElementById('topScorerName');
+        this.topScorerScore = document.getElementById('topScorerScore');
+        this.topScorerPercentage = document.getElementById('topScorerPercentage');
+        this.topScorerDate = document.getElementById('topScorerDate');
+        this.championBadge = document.getElementById('championBadge');
 
         // Quiz screen elements
         this.currentQuestionEl = document.getElementById('currentQuestion');
@@ -305,6 +313,86 @@ class QuizApp {
         this.leaderboard = this.getLeaderboard();
     }
 
+    async loadTopScorer() {
+        try {
+            // Try to load from db.json first
+            const response = await fetch('db.json');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.topScorers && data.topScorers.length > 0) {
+                    this.displayTopScorer(data.topScorers[0]);
+                    return;
+                }
+            }
+        } catch (error) {
+            console.log('Could not load db.json, using localStorage');
+        }
+
+        // Fallback to localStorage
+        const leaderboard = this.getLeaderboard();
+        if (leaderboard.length > 0) {
+            const topScorer = leaderboard[0];
+            this.displayTopScorer({
+                name: topScorer.name,
+                score: topScorer.score,
+                totalQuestions: topScorer.totalQuestions || 60,
+                percentage: topScorer.percentage,
+                date: topScorer.date,
+                badge: this.getBadge(topScorer.percentage)
+            });
+        } else {
+            // Show default/demo data
+            this.displayTopScorer({
+                name: 'Be the first!',
+                score: 0,
+                totalQuestions: 60,
+                percentage: 0,
+                date: new Date().toISOString(),
+                badge: 'ROOKIE'
+            });
+        }
+    }
+
+    getBadge(percentage) {
+        if (percentage >= 95) return 'LEGEND';
+        if (percentage >= 90) return 'MASTER';
+        if (percentage >= 80) return 'EXPERT';
+        if (percentage >= 70) return 'PRO';
+        if (percentage >= 60) return 'ADVANCED';
+        return 'ROOKIE';
+    }
+
+    displayTopScorer(scorer) {
+        if (!this.topScorerName) return;
+
+        this.topScorerName.textContent = scorer.name;
+        this.topScorerScore.textContent = scorer.score;
+        this.topScorerPercentage.textContent = `${scorer.percentage}%`;
+
+        const date = new Date(scorer.date);
+        this.topScorerDate.innerHTML = `
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            ${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        `;
+
+        this.championBadge.textContent = scorer.badge || this.getBadge(scorer.percentage);
+
+        // Update badge color based on level
+        const badgeColors = {
+            'LEGEND': 'bg-yellow-500/30 border-yellow-500 text-yellow-400',
+            'MASTER': 'bg-cosmic-orange/30 border-cosmic-orange text-cosmic-orange',
+            'EXPERT': 'bg-purple-500/30 border-purple-500 text-purple-400',
+            'PRO': 'bg-blue-500/30 border-blue-500 text-blue-400',
+            'ADVANCED': 'bg-green-500/30 border-green-500 text-green-400',
+            'ROOKIE': 'bg-gray-500/30 border-gray-500 text-gray-400'
+        };
+
+        const badge = scorer.badge || this.getBadge(scorer.percentage);
+        this.championBadge.className = `px-3 py-1 rounded-full text-xs font-bold ${badgeColors[badge] || badgeColors['ROOKIE']}`;
+    }
+
     displayTopScores() {
         const topScores = this.getLeaderboard().slice(0, 5);
 
@@ -392,6 +480,7 @@ class QuizApp {
         this.resultsScreen.classList.add('hidden');
         this.welcomeScreen.classList.remove('hidden');
         this.playerNameInput.value = '';
+        this.loadTopScorer();
         this.displayTopScores();
     }
 }
